@@ -3,13 +3,14 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Hexo
+title: 资源吧
 subtitle: ""
-description: ""
-keywords:
-author: John Doe
+description: "欢迎来到资源吧（zyb.asia），一个致力于为广大用户提供丰富、高质量学习资料与实用工具的在线平台。"
+keywords: "资源分享, 在线学习, 教程下载, 设计素材, 学术论文, 行业报告, 开放平台, 知识共享, 实用工具, 学习资料"
+author: 资源吧
 language: en
 timezone: ""
+root: /zyb/
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
@@ -101,4 +102,9 @@ theme: anzhiyu
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
-  type: ""
+  - type: git
+    repo: https://gitee.com/JIAXInT/zyb.git
+    branch: gh-pages
+  - type: git
+    repo: git@github.com:JIAXInT/zyb.git
+    branch: gh-pages
