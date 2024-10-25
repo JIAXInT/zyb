@@ -8,9 +8,9 @@ on:
 env:
   GIT_USER: JIAXInT
   GIT_EMAIL: 1131918725@qq.com
-  THEME_REPO: JIAXInT/zyb/
+  THEME_REPO: JIAXInT/zyb
   THEME_BRANCH: master
-  DEPLOY_REPO: JIAXInT/zyb/
+  DEPLOY_REPO: JIAXInT/zyb
   DEPLOY_BRANCH: gh-pages
 
 jobs:
