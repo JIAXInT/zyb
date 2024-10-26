@@ -1,74 +1,48 @@
-name: 自动部署 Hexo
+name: DoubleAm's Blog CI/CD # 脚本 workflow 名称
 
 on:
   push:
-    branches:
-      - master
+    branches: [main, master] # 当监测 main,master 的 push
+    paths: # 监测所有 source 目录下的文件变动，所有 yml,json 后缀文件的变动。
+      - "*.json"
+      - "**.yml"
+      - "**/source/**"
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [20.x]
-
+  blog: # 任务名称
+    timeout-minutes: 30 # 设置 30 分钟超时
+    runs-on: ubuntu-latest # 指定最新 ubuntu 系统
     steps:
-      - name: 开始运行
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2 # 拉取仓库代码
+      - uses: actions/setup-node@v2 # 设置 node.js 环境
+      - name: Cache node_modules # 缓存 node_modules，提高编译速度，毕竟每月只有 2000 分钟。
+        uses: actions/cache@v2 # 亲测 Github 服务器编译速度比我自己电脑都快，如果每次构建按5分钟计算，我们每个月可以免费部署 400 次，Github yyds！！！
+        env:
+          cache-name: cache-node-modules
         with:
-          submodules: true
-  
-      - name: 安装Pandoc
-        uses: nikeee/setup-pandoc@v1
-  
-      - name: 设置 Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: 安装 Hexo CI
-        run: |
-          export TS='Asia/Shanghai'
-          npm install hexo-cli -g
-
-      - name: 缓存
-        uses: actions/cache@v1
-        id: cache-dependencies
-        with:
-          path: node_modules
-          key: ${{runner.OS}}-${{hashFiles('**/package-lock.json')}}
-  
-      - name: 安装依赖插件
-        run: |
-          # Install Plugins with 'npm install'
-  
-      - name: 安装插件
-        if: steps.cache-dependencies.outputs.cache-hit != 'true'
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - name: Init Node.js # 安装源代码所需插件
         run: |
           npm install
-  
-      - name: 配置SSH私钥
-        env:
-          HEXO_DEPLOY_PRIVATE_KEY: ${{secrets.GIT_PRI}}
+          echo "init node successful"
+      - name: Install Hexo-cli # 安装 Hexo
         run: |
-          mkdir -p ~/.ssh/
-          echo "$HEXO_DEPLOY_PRIVATE_KEY" > ~/.ssh/id_rsa 
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan github.com >> ~/.ssh/known_hosts  
-
-      - name: 部署博客
-        run: | 
-          # 以防万一有些遗留代码还是没删
-          # hexo clean 以下的代码都是必需的，不可删去
-          git config --global credential.helper store
-          git config --global init.defaultBranch master
-          git config --global user.name "${{secrets.GIT_NAME}}"
-          git config --global user.email "${{secrets.GIT_EMAIL}}" 
-          git config --global user.password "${{secrets.GIT_PSW}}"
+          npm install -g hexo-cli --save
+          echo "install hexo successful"
+      - name: Build Blog # 编译创建静态博客文件
+        run: |
           hexo clean
-          hexo g -d
-          cd ./public
-          git init
-          git add .
-          git commit -m 'Update'
-          git push --force --quiet 'https://${{secrets.GH_TOKEN}}@github.com/${{secrets.GH_REF}}' master
+          hexo g
+          echo "build blog successful"
+      - name: Deploy DoubleAm's Blog # 设置 git 信息并推送静态博客文件
+        run: |
+          git config --global user.name "doubleam"
+          git config --global user.email "admin@biugle.cn"
+          hexo deploy
+
+      - run: echo "Deploy Successful!"
