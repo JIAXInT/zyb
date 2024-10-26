@@ -10,7 +10,7 @@ keywords: "资源分享, 在线学习, 教程下载, 设计素材, 学术论文,
 author: 资源吧
 language: en
 timezone: ""
-root: /zyb/
+# root: /zyb/
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
@@ -102,9 +102,9 @@ theme: anzhiyu
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
-  - type: git
-    repo: https://gitee.com/JIAXInT/zyb.git
-    branch: gh-pages
+  # - type: git
+  #   repo: https://gitee.com/JIAXInT/zyb.git
+  #   branch: gh-pages
   - type: git
     repo: git@github.com:JIAXInT/zyb.git
     branch: gh-pages
